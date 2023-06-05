@@ -13,6 +13,8 @@ const notFoundMiddleware = require("./middleware/not-found");
 const fileUpload = require("express-fileupload");
 require("express-async-errors");
 require("dotenv").config({ path: path.join(root_dir, `.env`) });
+// Import the index router
+const indexRouter = require('./routers/index');
 
 // cors
 const whitelist = [
@@ -41,6 +43,8 @@ const corsOptions = {
   "Access-Control-Request-Headers": "*",
 };
 
+
+
 app.set("trust proxy", 1);
 app.use(
   rateLimiter({
@@ -55,6 +59,11 @@ app.use(mongoSanitize());
 app.use(express.json());
 app.use(morgan("tiny"));
 
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+
+app.set('views', path.join(__dirname,  'views'));
+
 // Routers
 const userAuthRouter = require("./routers/user/authRoutes");
 
@@ -64,6 +73,9 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/user/auth", userAuthRouter);
+
+// Mount the index router
+app.use('/user', indexRouter);
 
 // Error Handlers
 app.use(notFoundMiddleware);
